@@ -1,16 +1,21 @@
+import {Zone} from "../Zone/Zone";
 
 export abstract class Entity<T extends IEntity> {
 
-    protected _entity: T;
-    public get entity() {
-        if (!this._entity) {
-            this._entity = Game.getObjectById(this.id);
-        }
-        return this._entity;
+    public entity: T;
+
+    public readonly id: string;
+    public readonly zone: Zone;
+    public readonly pos: RoomPosition;
+
+    constructor(entity: T, zone: Zone) {
+        this.entity = entity;
+        this.id = entity.id;
+        this.pos = entity.pos;
+        this.zone = zone;
     }
 
-    private id: string;
-    constructor(id: string) {
-        this.id = id;
+    public update() {
+        this.entity = Game.getObjectById<T>(this.id);
     }
 }

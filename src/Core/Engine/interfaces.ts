@@ -10,6 +10,7 @@ interface ISync {
 
 interface IUpdate {
     priority: number;
+    id: string;
     update(): void;
 }
 

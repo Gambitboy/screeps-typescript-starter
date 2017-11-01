@@ -1,0 +1,3 @@
+interface BotMemory {
+    state: string;
+}

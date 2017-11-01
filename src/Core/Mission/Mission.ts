@@ -1,24 +1,31 @@
-import {Operation} from "../Operation/Operation";
-import {Role} from "../Role/Role";
+import {Bot} from "../Bot/Bot";
+import {ZoneOperation} from "../Operation/ZoneOperation";
+import {Zone} from "../Zone/Zone";
 
 export abstract class Mission {
 
-    public readonly operation: Operation;
+
+    public readonly zone: Zone;
+    public readonly operation: ZoneOperation;
     public readonly name: string;
-    public memory: MissionMemory;
+    public readonly bots: Bot[] = [];
 
-    public agents: {
-        [roleName: string]: Role[];
-    };
-
-    constructor(operation: Operation, name: string) {
+    constructor(operation: ZoneOperation, name: string) {
         this.operation = operation;
         this.name = name;
+        this.zone = operation.zone;
     }
 
     public abstract init();
 
-    public addAgent(agent: Role) {
-        //this.agents[agent.roleName].push(agent);
+    protected addBot(bot: Bot) {
+        bot.init();
+        this.bots.push(bot);
+    }
+
+    public destroy() {
+        for (let bot of this.bots) {
+            bot.destroy();
+        }
     }
 }

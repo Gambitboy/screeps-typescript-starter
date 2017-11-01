@@ -5,8 +5,8 @@
     "removeComments": true,
     "noEmitOnError": true,
     "noResolve": false,
-    "sourceMap": true,
-    "baseUrl": "./src/"
+    "baseUrl": "./src/",
+    "outDir": "./dist"
   },
   "compileOnSave": false,
   "include": [

@@ -5,7 +5,7 @@ import {Zone} from "../Zone/Zone";
 
 export class OperationFactory implements ILinkMemory {
 
-    public operations: {[operationName: string]: ZoneOperation } = {};
+    public operations: {[operationId: string]: ZoneOperation } = {};
 
     public memory: {
         nextScan: number;
@@ -24,6 +24,7 @@ export class OperationFactory implements ILinkMemory {
 
     public update() {
         this.scanFlags();
+        this.checkFlag();
     }
 
     private scanFlags() {
@@ -34,16 +35,31 @@ export class OperationFactory implements ILinkMemory {
             let type = OperationFactory.getType(flagName);
             let constructor = this.constructors[type];
             if (!constructor) { continue; }
-            let locator = Game.flags[flagName];
-            let zone = Zone.get(locator.pos.roomName);
-            let operation = new constructor(flagName, locator, zone);
+            let flag = Game.flags[flagName];
+            let zone = Zone.get(flag.pos.roomName);
+            let name = OperationFactory.getName(flagName);
+            let operation = new constructor(name, flagName, flag, zone);
             core.linker.addLink(flagName, operation, this);
             this.operations[flagName] = operation;
             operation.init();
         }
     }
 
+    private checkFlag() {
+        for (let id in this.operations) {
+            let flag = Game.flags[id];
+            if (flag) { continue; }
+            let operation = this.operations[id];
+            this.scanned[id] = false;
+            operation.destroy();
+        }
+    }
+
     private static getType(flagName: string): string {
         return flagName.substring(0, flagName.indexOf("_"));
+    }
+
+    private static getName(flagName: string): string {
+        return flagName.substring(flagName.indexOf("_") + 1);
     }
 }

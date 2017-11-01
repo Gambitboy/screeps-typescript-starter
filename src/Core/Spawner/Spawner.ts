@@ -1,4 +1,4 @@
-import {Role} from "../Role/Role";
+import {Bot} from "../Bot/Bot";
 
 export class Spawner {
 
@@ -8,13 +8,13 @@ export class Spawner {
         this.spawning = false;
     }
 
-    public spawn(agent: Role): string {
+    public spawn(agent: Bot): string {
         let spawn = Game.spawns.Spawn1;
         if (spawn.spawning || this.spawning) { return; }
-        let outcome = spawn.spawnCreep(agent.getBody(), agent.name);
+        let outcome = spawn.spawnCreep(agent.body, agent.id);
         if (outcome === OK) {
             this.spawning = true;
-            return agent.name;
+            return agent.id;
         }
     }
 }
