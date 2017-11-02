@@ -29,7 +29,11 @@ export class Updater {
             let items = this.items[priority];
             for (let id in items) {
                 let item = items[id];
-                item.update();
+                try {
+                    item.update();
+                } catch (e) {
+                    console.log(e.stack)
+                }
             }
         }
     }

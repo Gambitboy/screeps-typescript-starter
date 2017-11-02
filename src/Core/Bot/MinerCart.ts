@@ -1,30 +1,31 @@
 import {Cart} from "./Cart";
-import {MiningOperation} from "../Operation/MiningOperation/MiningOperation";
+import {MiningOperation} from "../Operation/MiningOperation";
 import {PriorityType} from "../../PriorityType";
-import {ZoneSource} from "../Entity/ZoneSource";
-import {MiningMission} from "../Mission/MiningMission/MiningMission";
+import {MiningMission} from "../Mission/MiningMission";
+import {SourceEntity} from "../Entity/SourceEntity";
+import {BOT_MINERCART} from "./constants";
 
 export class MinerCart extends Cart {
 
     public readonly operation: MiningOperation;
     public readonly priority = PriorityType.Harvest;
-    public readonly source: ZoneSource;
+    public readonly source: SourceEntity;
     public readonly mission: MiningMission;
 
     constructor(mission: MiningMission, id: number) {
-        super(mission.operation, "minerCart", `${mission.order}${id}`);
+        super(mission.operation, BOT_MINERCART, `${mission.order}${id}`);
         this.mission = mission;
         this.source = mission.source;
     }
 
-    protected getOrigin(): Creep | Structure {
+    protected getPickUp(): IResourceHolder {
         let miner = _.find(this.mission.miners, b => b.creep);
         if (miner) {
-            return miner.creep;
+            return miner;
         }
     }
 
-    protected getDestination(): Creep | Structure {
-        return Game.spawns.Spawn1;
+    protected getDropOff(): IResourceHolder {
+        return this.mission.destination;
     }
 }

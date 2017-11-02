@@ -73,7 +73,6 @@ export class Traveler {
         // check if creep is stuck
         let pushedCreep;
         if (this.isStuck(creep, state)) {
-            console.log("stuck!");
             state.stuckCount++;
             Traveler.circle(creep.pos, "magenta", state.stuckCount * .2);
             if (options.pushy) {

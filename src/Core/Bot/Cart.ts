@@ -8,21 +8,26 @@ export abstract class Cart extends Bot {
 
     protected getBoost(): string[] { return undefined; }
 
-    protected abstract getOrigin(): Creep|Structure;
+    protected abstract getPickUp(): IResourceHolder;
 
-    protected abstract getDestination(): Creep|Structure;
+    protected abstract getDropOff(): IResourceHolder;
 
     protected pickUp() {
-        if (this.load === this.creep.carryCapacity) {
+        if (this.currentAmount === this.creep.carryCapacity) {
             this.switchState("dropOff");
             return;
         }
 
-        let origin = this.getOrigin();
+        let origin = this.getPickUp();
+        if (!origin) {
+            console.log("no pickUp");
+            return;
+        }
+
         if (this.creep.pos.isNearTo(origin)) {
             let outcome = this.withdraw(origin, RESOURCE_ENERGY);
             if (outcome === OK && this.fullWithdraw(origin)) {
-                this.travelTo(this.getDestination());
+                this.travelTo(this.getDropOff());
             }
         } else {
             this.travelTo(origin);
@@ -30,59 +35,32 @@ export abstract class Cart extends Bot {
     }
 
     protected dropOff() {
-        if (this.load === 0) {
+        if (this.currentAmount === 0) {
             this.switchState("pickUp");
             return;
         }
 
-        let destination = this.getDestination();
+        let destination = this.getDropOff();
+        if (!destination) {
+            console.log("no dropOff");
+            return;
+        }
+
         if (this.creep.pos.isNearTo(destination)) {
-            let outcome = this.creep.transfer(destination, RESOURCE_ENERGY);
+            let outcome = this.transfer(destination, RESOURCE_ENERGY);
             if (outcome === OK && this.fullTransfer(destination)) {
-                this.travelTo(this.getOrigin());
+                this.travelTo(this.getPickUp());
             }
         } else {
             this.travelTo(destination);
         }
     }
 
-    protected fullWithdraw(target: Creep|Structure): boolean {
-        return this.spaceRemaining(this.creep) >= this.storedAmount(target);
+    protected fullWithdraw(target: IResourceHolder): boolean {
+        return target.currentAmount >= this.spaceRemaining;
     }
 
-    protected fullTransfer(target: Creep|Structure): boolean {
-        return this.storedAmount(this.creep) <= this.spaceRemaining(target);
-    }
-
-    protected storedAmount(target: Creep|Structure): number {
-        if (target instanceof Creep) {
-            return _.sum(target.carry);
-        } else {
-            if (target.hasOwnProperty("energy")) {
-                return (target as any).energy;
-            } else if (target.hasOwnProperty("store")) {
-                return _.sum((target as any).store);
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    protected storeCapacity(target: Creep|Structure): number {
-        if (target instanceof Creep) {
-            return target.carryCapacity;
-        } else {
-            if (target.hasOwnProperty("storeCapacity")) {
-                return _.sum((target as any).storeCapacity);
-            } else if (target.hasOwnProperty("energyCapacity")) {
-                return (target as any).energyCapacity;
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    protected spaceRemaining(target: Creep|Structure): number {
-        return this.storeCapacity(target) - this.storedAmount(target);
+    protected fullTransfer(target: IResourceHolder): boolean {
+        return target.spaceRemaining >= this.currentAmount;
     }
 }
