@@ -7,8 +7,7 @@
     "interface-name": [false],
     "no-console": [false],
     "trailing-comma": [
-      true,
-      "never"
+      true
     ],
     "variable-name": [
       true,
